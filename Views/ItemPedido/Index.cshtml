@@ -1,0 +1,103 @@
+@namespace EstoqueWeb.Models
+@model IEnumerable<ItemPedidoModel>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+    @{
+        var pedido = ViewBag.Pedido as PedidoModel;
+        ViewBag.Subtitulo = $" Itens do Pedido<b> {pedido.IdPedido:D4} </b>";
+    }
+    <header class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="text-primary">
+                @Html.Raw(@ViewBag.Subtitulo)
+                @(pedido.DataPedido.HasValue ? "(Fechado)" : "")
+           </h1>
+        </div>
+        <!-- testo se o pedido esta sem data, ou seja , pedido fechado não mostra o botão --> 
+        @if (!pedido.DataPedido.HasValue)
+        {
+          <div>
+            <a asp-action="Cadastrar"asp-route-ped="@pedido.IdPedido"
+            class="btn btn-primary">Novo Item</a>
+          </div>
+            
+        }
+    </header>
+    <!-- só consigo mostra esse cliente porque na controller eu adicionei esse cliente na viewbag
+    como o metodo include  -->
+    <h5>Cliente:  <b>@pedido.Cliente.Nome</b></h5>
+    <hr>
+
+    @if (pedido.DataEntrega.HasValue)
+    {
+        <h6>Endereço de Entrega: @pedido.EnderecoEntrega.EnderecoCompleto</h6>
+        <hr>
+    }
+
+
+    <partial name="_Mensagem"></partial>
+    @if (Model.Count() > 0)
+    {
+        <Table class="table table-striped tabela-itens">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Valor Unit.</th>
+                    <th>Qtde</th>
+                    <th>Valor Item</th>
+                    @if (!pedido.DataPedido.HasValue)
+                    {
+                        <th>Ações</th>
+                    }
+                   
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var itemPedido in Model)
+                {
+                    <tr>
+                        <td>@itemPedido.Produto.Nome</td>
+                        <td>@itemPedido.ValorUnitario.ToString("C")</td>
+                        <td>@itemPedido.Quantidade</td>
+                        <td>@itemPedido.ValorItem.ToString("C")</td>
+                        @if (!pedido.DataPedido.HasValue)
+                        {
+                            <td>
+                                <a asp-action="Cadastrar" asp-route-ped="@itemPedido.IdPedido"
+                                asp-route-prod="@itemPedido.IdProduto"
+                                class="btn btn-sm btn-secondary"><i class="bi-pencil"title="Alterar Item do pedido"></i></a>
+                                <a asp-action="Excluir" asp-route-ped="@itemPedido.IdPedido"
+                                asp-route-prod="@itemPedido.IdProduto"
+                                class="btn btn-sm btn-danger"><i class="bi-trash"title="Excluir Item do pedido"></i></a>
+                            </td>
+                            
+                        }
+                       
+                    </tr>      
+                }
+            </tbody>
+            <tfoot>
+                 <tr>
+                    <td colspan="3"class="text-end"><b>Valor Total do Pedido:</b></td>
+                    <td><b>@Model.Sum(i => i.ValorItem).ToString("C")</b></td>
+                    @if (!pedido.DataPedido.HasValue)
+                    {
+                        <td></td>
+                    }
+                 </tr>
+            </tfoot>
+        </Table>
+    }
+    else
+    {
+        <p>Não há nenhum item cadastrado para esse pedido.</p>
+    }
+    <div class="d-flex justify-content-end align-items-center gap-2">
+
+        <a asp-action="Index"asp-controller="Pedido"asp-route-cid="@pedido.IdCliente"
+        class="btn btn-outline-success">Voltar</a>
+        @if(!pedido.DataPedido.HasValue && pedido.ItensPedido.Count() > 0)
+        {
+             <a asp-action="Fechar"asp-controller="Pedido"asp-route-id="@pedido.IdPedido"
+        class="btn btn-success">Fechar Pedido</a>
+        }
+    </div>

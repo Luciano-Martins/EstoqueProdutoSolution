@@ -1,0 +1,52 @@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@namespace EstoqueWeb.Models
+@model IEnumerable<PedidoModel>
+
+@{
+    ViewBag.Subtitulo = "Pagina Principal";
+}
+<h1 class="text-primary ">Bem-vindo ao <b>EstoqueWeb<span class="text-danger">V2</span></b></h1>
+<hr>
+<P>Gerencia seu estoque de produtos e suas vendas, 
+    use o menu superior para acessar os recursos da aplicação
+</P>
+<hr>
+<partial name="_mensagem"></partial>
+
+ @if (Model.Count() > 0)
+{
+
+
+            <Table class="table table-striped tabela-abertos ">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Cliente</th>
+                        <th>Valor Total</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+            @foreach (var pedido in Model)
+            {
+                <tr>
+                    <td >@pedido.IdPedido.ToString("D4")</td>
+                    <td>@pedido.Cliente.Nome</td>
+                    <td>@pedido.ValorTotal.Value.ToString("C")</td>
+                    <td>
+                        <a asp-action="Fechar" asp-route-id="@pedido.IdPedido"asp-controller="Pedido"
+                          class="btn btn-sm btn-success"><i class="bi-check-lg"title="Fechar pedido"></i></a>
+                        <a asp-action="Index"asp-controller="ItemPedido" asp-route-ped="@pedido.IdPedido"
+                          class="btn btn-sm btn-info"><i class="bi-list-check"title="Itens do Pedido"></i></a>
+                        <a asp-action="Excluir" asp-route-id="@pedido.IdPedido"asp-controller="Pedido"
+                          class="btn btn-sm btn-danger"><i class="bi-trash"title="Excluir Pedido"></i></a>
+                     </td>     
+                </tr>      
+            }
+                </tbody>
+            </Table>
+}
+else
+{
+            <p>Não há nenhuma pedido em aberto no momento.</p>
+}

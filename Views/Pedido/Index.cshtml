@@ -1,0 +1,73 @@
+@namespace EstoqueWeb.Models
+@model IEnumerable<PedidoModel>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+    @{
+        var cliente = ViewBag.Cliente as ClienteModel;
+        ViewBag.Subtitulo = $"Pedidos do Cliente <b>{cliente.Nome}</b>";
+    }
+    <header class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="text-primary">@Html.Raw(ViewBag.Subtitulo)</h1>
+        </div>
+        <div>
+            <a asp-action="Cadastrar" asp-route-cid="@cliente.IdUsuario" class="btn btn-primary">Novo Pedido</a>
+        </div>
+
+    </header>
+    <hr>
+    <partial name="_Mensagem"></partial>
+    @if (Model.Count() > 0)
+    {
+        <Table class="table table-striped tabela-pedidos ">
+            <thead>
+                <tr>
+                    <th>Número</th>
+                    <th>Data/Hora Pedido</th>
+                    <th>Valor Total</th>
+                    <th>Data/Hora Entrega</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pedido in Model)
+                {
+                    <tr>
+                        <td>@pedido.IdPedido.ToString("D4")</td>
+                        <td>@(pedido.DataPedido.HasValue ? pedido.DataPedido : "Em Aberto")</td>
+                        <td>@pedido.ValorTotal.Value.ToString("C")</td>
+                        <td>@(pedido.DataEntrega.HasValue ? pedido.DataEntrega : "Não Entregue")</td>
+                        <td>
+
+                            @if (pedido.DataPedido.HasValue)
+                            {
+                                <span class="btn btn-sm btn-light"><i class="bi-check-lg text-gray"title="Pedido já fechado"></i></span>
+                                @if (pedido.DataEntrega.HasValue)
+                                {
+                                    <span class="btn btn-sm btn-light"><i class="bi-truck text-gray"title="Pedido já entregue"></i></span> 
+                                }
+                                else
+                                {
+                                    <a asp-action="Entregar" asp-route-id="@pedido.IdPedido"
+                                     class="btn btn-sm btn-warning"><i class="bi-truck"title="Registrar entrega do pedido"></i></a>
+                                }
+                            }
+                            else
+                            {
+                                  <a asp-action="Fechar" asp-route-id="@pedido.IdPedido"
+                                     class="btn btn-sm btn-success"><i class="bi-check-lg"title="Fechar pedido"></i></a>
+                                  <span class="btn btn-sm btn-light"><i class="bi-truck text-gray"title="Feche o pedido antes de registrar a entrega"></i></span> 
+                            }
+                            <a asp-action="Index"asp-controller="ItemPedido" asp-route-ped="@pedido.IdPedido"
+                               class="btn btn-sm btn-info"><i class="bi-list-check"title="Itens do Pedido"></i></a>
+                            <a asp-action="Excluir" asp-route-id="@pedido.IdPedido"
+                               class="btn btn-sm btn-danger"><i class="bi-trash"title="Excluir Pedido"></i></a>
+                        </td>
+                    </tr>      
+                }
+            </tbody>
+        </Table>
+    }
+    else
+    {
+        <p>Não há nenhuma pedido cadastrado.</p>
+    }

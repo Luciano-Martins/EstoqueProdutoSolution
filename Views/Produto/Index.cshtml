@@ -1,0 +1,53 @@
+@namespace EstoqueWeb.Models
+@model IEnumerable<ProdutoModel>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+    @{
+        ViewBag.Subtitulo = "Listagem de Produtos";
+    }
+    <header class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="text-primary">@ViewBag.Subtitulo</h1>
+        </div>
+        <div>
+            <a asp-action="Cadastrar"  class="btn btn-primary">Novo Produto</a>
+        </div>
+
+    </header>
+    <hr>
+    <partial name="_Mensagem"></partial>
+    @if (Model.Count() > 0)
+    {
+        <Table class="table table-striped tabela-produtos">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Categoria</th>
+                    <th>Estoque</th>
+                    <th>Preço</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var produto in Model)
+                {
+                    <tr>
+                        <td>@produto.Nome</td>
+                        <td>@produto.Categoria.Nome</td>
+                        <td>@produto.Estoque.ToString("D4")</td>
+                        <td>@produto.Preco.ToString("C")</td>
+                        <td>
+                            <a asp-action="Cadastrar" asp-route-id="@produto.IdProduto"
+                               class="btn btn-sm btn-secondary"><i class="bi-pencil"title="Alterar Produto"></i></a>
+                            <a asp-action="Excluir" asp-route-id="@produto.IdProduto"
+                               class="btn btn-sm btn-danger"><i class="bi-trash"title="Excluir Produto"></i></a>
+                        </td>
+                    </tr>      
+                }
+
+            </tbody>
+        </Table>
+    }
+    else
+    {
+        <p>Não há nenhuma produto cadastrado.</p>
+    }

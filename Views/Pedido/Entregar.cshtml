@@ -1,0 +1,59 @@
+@namespace EstoqueWeb.Models
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@model PedidoModel
+@{
+    ViewBag.Subtitulo = $"Registro de entrega do Pedido <b>{Model.IdPedido:D4}</b>";
+}
+<h1 class="text-primary">@Html.Raw(ViewBag.Subtitulo)</h1>
+<hr>
+<h6>Cliente:<b class="text-dark">@Model.Cliente.Nome</b></h6>
+<hr>
+@if (Model.ItensPedido.Count() > 0)
+{
+   <h6><b>Itens do pedido:</b></h6>
+   <hr>
+   @foreach (var item in Model.ItensPedido)
+   {
+     <h6>@item.Produto.Nome (@item.Quantidade x @item.ValorUnitario.ToString("C") = 
+        @item.ValorItem.ToString("C"))</h6>
+   } 
+   <hr>
+   <h6><b>Valor Total do pedido:@Model.ValorTotal.Value.ToString("C")</b></h6>
+}
+else
+{
+   <h6><b>Valor Total do pedido:</b></h6>  
+}
+@if (Model.Cliente.Enderecos.Count() > 0)
+{
+        <h3>Escolha o endereço de entrega:</h3>
+    <form asp-action="Entregar">
+        <input type="hidden"asp-for="@Model.IdPedido" >
+        <div class="mt-3">
+            @foreach (var endereco in Model.Cliente.Enderecos)
+            {
+                <div class="form-check">
+                    <input 
+                    checked="@endereco.Selecionado"
+                    class="form-check-input"
+                    type="radio" 
+                    name="IdEndereco"
+                    value="@endereco.IdEndereco"
+                    id='@($"opcao{endereco.IdEndereco}")'>
+                    <label class="form-check-label" for='@($"opcao{endereco.IdEndereco}")'>
+                        @endereco.EnderecoCompleto
+                    </label>
+                </div>
+            }
+            <hr>
+                     <a asp-action="Index" asp-route-cid="@Model.IdCliente"class="btn btn-secondary">Cancelar</a>
+                    <button class="btn btn-success"type="submit">Registrar Entrega</button>
+        </div>
+    </form>
+}
+else
+{
+    <h6>Este cliente ainda não possui endereço cadastrado.</h6>
+
+}
